@@ -11,7 +11,18 @@ import os
 
 
 # Get the absolute path to the frontend folder
-frontend_folder = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'frontend')
+# In Docker, the structure is /app/medical-chatbot/app.py and /app/frontend/
+# Locally, the structure is medical-chatbot/app.py and frontend/
+base_dir = os.path.dirname(os.path.abspath(__file__))
+frontend_folder = os.path.join(os.path.dirname(base_dir), 'frontend')
+
+# Check if frontend folder exists, if not try alternate path
+if not os.path.exists(frontend_folder):
+    frontend_folder = os.path.join(base_dir, '..', 'frontend')
+    frontend_folder = os.path.abspath(frontend_folder)
+
+print(f"Frontend folder: {frontend_folder}")
+print(f"Frontend exists: {os.path.exists(frontend_folder)}")
 
 app = Flask(__name__, 
             template_folder=frontend_folder,
