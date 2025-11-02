@@ -3,16 +3,13 @@ FROM python:3.10-slim-buster
 WORKDIR /app
 
 # Copy requirements first for better caching
-COPY medical-chatbot/requirements.txt .
+COPY requirements.txt .
 
 # Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the medical-chatbot source code
-COPY medical-chatbot/ .
-
-# Copy the frontend folder
-COPY frontend/ ./frontend/
+# Copy the entire application
+COPY . .
 
 # Expose port
 EXPOSE 5000

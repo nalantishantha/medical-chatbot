@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Chatbot - Your Health Assistant</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-heartbeat"></i>
+                    <h1>Medical Chatbot</h1>
+                </div>
+                <p class="subtitle">Your AI-powered health assistant</p>
+            </div>
+        </div>
+
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div class="chat-box" id="chatBox">
+                <!-- Welcome Message -->
+                <div class="message bot-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-text">
+                            <p>Hello! I'm your Medical Chatbot assistant. I can help answer your medical questions based on reliable medical information.</p>
+                            <p class="disclaimer"><strong>Disclaimer:</strong> This is an AI assistant and should not replace professional medical advice. Always consult with a healthcare provider for medical concerns.</p>
+                        </div>
+                        <div class="message-time" id="welcomeTime"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-container">
+                <form id="chatForm">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Ask me anything about health and medicine..." 
+                            rows="1"
+                            autocomplete="off"
+                        ></textarea>
+                        <button type="submit" id="sendButton" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </form>
+                <div class="suggestions">
+                    <span class="suggestion-label">Quick questions:</span>
+                    <button class="suggestion-btn">What are symptoms of flu?</button>
+                    <button class="suggestion-btn">How to manage diabetes?</button>
+                    <button class="suggestion-btn">Benefits of regular exercise</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div class="loading" id="loading">
+            <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+</body>
+</html>
