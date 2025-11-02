@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+medibot/
+
+# Virtual environments
+.venv
+*.egg-info/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Jupyter
+research/
+*.ipynb
+
+# Tests
+tests/
+test_*.py
+
+# Documentation
+README.md
+docs/
+
+# Environment variables (don't copy .env to image)
+.env
+.env.local
+
+# Data files (optional - remove if needed in container)
+data/
+
+# GitHub
+.github/
