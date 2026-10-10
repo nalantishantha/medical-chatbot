@@ -14,7 +14,10 @@ from src.prompt import *
 import os
 import glob
 import json
+import logging
 from langchain_community.chat_message_histories import FileChatMessageHistory
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
 # Get the absolute path to the frontend folder
@@ -28,30 +31,26 @@ if not os.path.exists(frontend_folder):
     # Try local development path
     frontend_folder = os.path.join(os.path.dirname(base_dir), 'frontend')
 
-print(f"Frontend folder: {frontend_folder}")
-print(f"Frontend exists: {os.path.exists(frontend_folder)}")
+logging.info(f"Frontend folder: {frontend_folder}")
+logging.info(f"Frontend exists: {os.path.exists(frontend_folder)}")
 if os.path.exists(frontend_folder):
-    print(f"Frontend contents: {os.listdir(frontend_folder)}")
+    logging.info(f"Frontend contents: {os.listdir(frontend_folder)}")
 
 app = Flask(__name__, 
             template_folder=frontend_folder,
             static_folder=frontend_folder,
             static_url_path='')
-app.secret_key = "super_secret_medical_key"
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", os.urandom(24))
 
 
 load_dotenv()
 
-PINECONE_API_KEY=os.environ.get('PINECONE_API_KEY')
-OPENAI_API_KEY=os.environ.get('OPENAI_API_KEY')
 
-os.environ["PINECONE_API_KEY"] = PINECONE_API_KEY
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 
 embeddings = download_hugging_face_embeddings()
 
-index_name = "medical-chatbot" 
+index_name = os.environ.get("PINECONE_INDEX_NAME", "medical-chatbot")
 # Embed each chunk and upsert the embeddings into your Pinecone index.
 docsearch = PineconeVectorStore.from_existing_index(
     index_name=index_name,
@@ -90,7 +89,6 @@ CHAT_DIR = os.path.join(base_dir, "chat_histories")
 os.makedirs(CHAT_DIR, exist_ok=True)
 
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
-    os.makedirs(CHAT_DIR, exist_ok=True)
     return FileChatMessageHistory(os.path.join(CHAT_DIR, f"{session_id}.json"))
 
 conversational_rag_chain = RunnableWithMessageHistory(
@@ -115,13 +113,12 @@ def index():
 def chat():
     session_id = session.get("session_id", "default_session")
     msg = request.form["msg"]
-    input = msg
-    print(input)
+    logging.info(f"User message: {msg}")
     response = conversational_rag_chain.invoke(
         {"input": msg},
         config={"configurable": {"session_id": session_id}}
     )
-    print("Response : ", response["answer"])
+    logging.info(f"Response : {response['answer']}")
     return str(response["answer"])
 
 @app.route("/clear", methods=["POST"])
