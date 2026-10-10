@@ -5,6 +5,11 @@ const sendButton = document.getElementById('sendButton');
 const chatForm = document.getElementById('chatForm');
 const loading = document.getElementById('loading');
 const suggestionButtons = document.querySelectorAll('.suggestion-btn');
+const clearChatBtn = document.getElementById('clearChatBtn');
+const sessionsList = document.getElementById('sessionsList');
+const newChatBtn = document.getElementById('newChatBtn');
+
+let currentSessionId = null;
 
 // Initialize welcome time
 document.getElementById('welcomeTime').textContent = getCurrentTime();
@@ -45,6 +50,9 @@ chatForm.addEventListener('submit', async function(e) {
         
         // Add bot response to chat
         addMessage(response, 'bot');
+        
+        // Update sessions list to reflect any new session title
+        loadSessions();
     } catch (error) {
         console.error('Error:', error);
         loading.classList.remove('active');
@@ -71,10 +79,32 @@ messageInput.addEventListener('keydown', function(e) {
     }
 });
 
+// Handle Clear Chat button click
+if (clearChatBtn) {
+    clearChatBtn.addEventListener('click', async function() {
+        try {
+            // Send request to backend to clear session history
+            await fetch('/clear', { method: 'POST' });
+            
+            // Clear chat UI except for welcome message
+            const welcomeMessage = chatBox.querySelector('.bot-message:first-child');
+            chatBox.innerHTML = '';
+            if (welcomeMessage) {
+                chatBox.appendChild(welcomeMessage);
+            }
+        } catch (error) {
+            console.error('Error clearing chat:', error);
+        }
+    });
+}
+
 // Function to add message to chat
-function addMessage(text, sender, isError = false) {
+function addMessage(text, sender, isError = false, animate = true) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}-message`;
+    if (!animate) {
+        messageDiv.style.animation = 'none';
+    }
     
     const avatarDiv = document.createElement('div');
     avatarDiv.className = 'message-avatar';
@@ -162,7 +192,98 @@ function formatMessage(text) {
 // Add smooth scroll behavior
 chatBox.style.scrollBehavior = 'smooth';
 
-// Focus on input when page loads
-window.addEventListener('load', () => {
+// Sessions Management Functions
+async function loadSessions() {
+    try {
+        const response = await fetch('/sessions');
+        const sessions = await response.json();
+        
+        sessionsList.innerHTML = '';
+        sessions.forEach(session => {
+            const div = document.createElement('div');
+            div.className = `session-item ${session.id === currentSessionId ? 'active' : ''}`;
+            div.dataset.id = session.id;
+            div.innerHTML = `<i class="fas fa-message"></i> ${session.title}`;
+            
+            div.addEventListener('click', () => switchSession(session.id));
+            sessionsList.appendChild(div);
+        });
+    } catch (e) {
+        console.error('Error loading sessions:', e);
+    }
+}
+
+async function switchSession(sessionId) {
+    try {
+        const response = await fetch('/session/switch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ session_id: sessionId })
+        });
+        
+        if (response.ok) {
+            currentSessionId = sessionId;
+            loadSessions(); // to update active state
+            await loadChatHistory();
+        }
+    } catch (e) {
+        console.error('Error switching session:', e);
+    }
+}
+
+async function loadChatHistory() {
+    try {
+        const response = await fetch('/history');
+        const history = await response.json();
+        
+        // Clear current chat
+        const welcomeMessage = chatBox.querySelector('.bot-message:first-child');
+        chatBox.innerHTML = '';
+        if (welcomeMessage) {
+            chatBox.appendChild(welcomeMessage);
+        }
+        
+        // Add history messages
+        history.forEach(msg => {
+            const sender = msg.type === 'human' ? 'user' : 'bot';
+            const content = msg.data.content;
+            addMessage(content, sender, false, false);
+        });
+        
+        // Scroll to bottom
+        chatBox.scrollTop = chatBox.scrollHeight;
+    } catch (e) {
+        console.error('Error loading history:', e);
+    }
+}
+
+if (newChatBtn) {
+    newChatBtn.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/session/new', { method: 'POST' });
+            const data = await response.json();
+            
+            if (data.status === 'success') {
+                currentSessionId = data.session_id;
+                loadSessions();
+                
+                // Clear current chat UI
+                const welcomeMessage = chatBox.querySelector('.bot-message:first-child');
+                chatBox.innerHTML = '';
+                if (welcomeMessage) {
+                    chatBox.appendChild(welcomeMessage);
+                }
+            }
+        } catch (e) {
+            console.error('Error creating new chat:', e);
+        }
+    });
+}
+
+// Initial Load
+window.addEventListener('load', async () => {
     messageInput.focus();
+    await loadSessions();
+    // After loading sessions, also get the history of the initial session if any
+    await loadChatHistory();
 });

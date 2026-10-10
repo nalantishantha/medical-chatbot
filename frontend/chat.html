@@ -9,15 +9,32 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
+    <div class="app-wrapper">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <button id="newChatBtn" class="new-chat-btn">
+                    <i class="fas fa-plus"></i> New Chat
+                </button>
+            </div>
+            <div class="sessions-list" id="sessionsList">
+                <!-- Sessions will be loaded here -->
+            </div>
+        </div>
+        
+        <div class="container">
+            <!-- Header -->
         <div class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <i class="fas fa-heartbeat"></i>
-                    <h1>Medical Chatbot</h1>
+            <div class="header-content" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div class="logo-container">
+                    <div class="logo">
+                        <i class="fas fa-heartbeat"></i>
+                        <h1>Medical Chatbot</h1>
+                    </div>
+                    <p class="subtitle">Your AI-powered health assistant</p>
                 </div>
-                <p class="subtitle">Your AI-powered health assistant</p>
+                <button id="clearChatBtn" style="background-color: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 0.9em; transition: all 0.2s;" onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'" onmouseout="this.style.backgroundColor='transparent'">
+                    <i class="fas fa-trash"></i> Clear Chat
+                </button>
             </div>
         </div>
 
@@ -71,6 +88,7 @@
                 <span></span>
             </div>
         </div>
+    </div>
     </div>
 
     <script src="scripts.js"></script>
